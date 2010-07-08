@@ -165,3 +165,21 @@ ko.bindingHandlers.css = {
         }
     }
 };
+
+// Binds a boolean observable to the checked state of an <input type="checkbox"/> element.
+ko.bindingHandlers.checked = {
+    init: function (element, value, allBindings) {
+        var eventName = allBindings.valueUpdate || "click";
+        if (ko.isWriteableObservable(value))
+            ko.utils.registerEventHandler(element, eventName, function () { 
+                value(!!this.checked); 
+            });
+        else if (allBindings._ko_property_writers && allBindings._ko_property_writers.value)
+            ko.utils.registerEventHandler(element, eventName, function () {
+                allBindings._ko_property_writers.value(!!this.checked);
+            });
+    },
+    update: function (element, value) {
+        element.checked = ko.utils.unwrapObservable(value);
+    }
+};
