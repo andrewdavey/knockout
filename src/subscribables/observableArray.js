@@ -1,6 +1,7 @@
 ﻿/// <reference path="observable.js" />
 
-ko.observableArray = function (initialValues) {
+ko.observableArray = function (initialValues, options) {
+    options = options || {};
     var result = new ko.observable(initialValues);
 
     ko.utils.arrayForEach(["pop", "push", "reverse", "shift", "sort", "splice", "unshift"], function (methodName) {
@@ -18,6 +19,13 @@ ko.observableArray = function (initialValues) {
             return underlyingArray[methodName].apply(underlyingArray, arguments);
         };
     });
+
+    if (typeof options.createItem == "function") {
+        result.add = function() {
+            var item = options.createItem.apply(result);
+            result.push(item);
+        };
+    }
 
     result.remove = function (valueOrPredicate) {
         var underlyingArray = result();
